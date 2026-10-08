@@ -29,8 +29,6 @@ time = nip_time./Fs;
 
 %% SEPARATE NEURAL DATA
 
-
-
 % separate data by port value
 data_indx = [];
 for port_num = 1:length(ports) 
@@ -91,11 +89,6 @@ filt_d = designfilt("notchiir", ...
     SampleRate=Fs,SystemObject=true);
 [emg_data] = filt_d(emg_data);
 
-%% SPLIT DATA INTO SECTIONS
-rest_section = find(and(global_time > 32, global_time < 40)); % reste between 32 and 40 s
-wrist_section = find(and(global_time > 21, global_time <= 32));
-not_wrist = find(or(global_time < 20, global_time >= 32));
-
 
 %% SPLIT DATA INTO SECTIONS AGAIN
 rest_section = find(and(global_time > 31, global_time < 39)); % reste between 31 and 39 s
@@ -105,26 +98,26 @@ active_section = find(global_time < 29);
 rest_data = emg_data(:,rest_section);
 active_data = emg_data(:,active_section);
 
-%% GET RESTING NOISE
+%% GET SNR
+% calculate signal rms
 noise_rms = std(rest_data,0,2);
-thresh_rms = -5*noise_rms;
+signal_rms = std(active_data,0,2);
 
-%% MAV
+% get time windows
+snr = 20.*signal_rms./noise_rms;
 
-mav = [];
-sample = 1;
-
-% loop over data computing mav for chunks of 33 ms
-for kk = 1:0.033*Fs:size(emg_data,2)-0.033*Fs
-    
-    mav(:,sample) = mean(abs(emg_data(:,kk:kk+0.033*Fs)),2);
-    sample = sample + 1;
-
-end % looping mav calc
-
-%% SNR
-
-snr = max(mav,[],2)./min(mav,[],2);
-
+%% Commented out for now
+% %% MAV
+% 
+% mav = [];
+% sample = 1;
+% 
+% % loop over data computing mav for chunks of 33 ms
+% for kk = 1:0.033*Fs:size(emg_data,2)-0.033*Fs
+% 
+%     mav(:,sample) = mean(abs(emg_data(:,kk:kk+0.033*Fs)),2);
+%     sample = sample + 1;
+% 
+% end % looping mav calc
 
 end
