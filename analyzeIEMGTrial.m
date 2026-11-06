@@ -1,4 +1,4 @@
-function [snr, ports, date] = analyzeIEMGTrial(file_path, vis)
+function [snr, signal_rms, noise_rms, ports, date] = analyzeIEMGTrial(file_path, vis)
 %%% MAT 20260417
 %%% reads an individual omnibus file and returns SNR of the iEMG 
 %%% electrodes.

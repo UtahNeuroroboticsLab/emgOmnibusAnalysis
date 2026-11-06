@@ -5,7 +5,7 @@ function [omnibus] = iemgDatasetAnalysis(omnibus_path)
 
 %% CHECK SAVED DATA
 try
-    load(fullfile(omnibus_path, 'iemg_data.mat'));
+    load(fullfile(omnibus_path, 'emg_omnibus_data.mat'));
     % finished paths (skip if already analyzed)
     fin_files = {omnibus.path};
     fin_files(cellfun('isempty',fin_files))=[];
@@ -61,11 +61,12 @@ for curr_rec = 1:length(folder_list)
 
         try
             % Load the ns5 file and analyze the active electrodes
-            [snr, ports, date] = analyzeIEMGTrial(file_path,1); % turned on visualization for selecting bad recordings
+            [snr, signal_rms, noise_rms, ports, date] = analyzeIEMGTrial(file_path,1); % turned on visualization for selecting bad recordings
 
             % generate temp struct
-            temp.active_electrodes = active;
             temp.snr = snr;
+            temp.noise = noise_rms;
+            temp.signal = signal_rms;
             temp.ports = ports;
             temp.date = datetime(date([1,2,4,5,6,7]));
             temp.dsi = caldays(between(datetime('20260127','Format','yyyyMMdd'),temp.date,'days'));
@@ -87,6 +88,6 @@ file_list = {omnibus.path};
 omnibus(cellfun('isempty',file_list))=[];
 
 
-save(fullfile(omnibus_path, 'omnibus_data.mat'), 'omnibus');
+save(fullfile(omnibus_path, 'emg_omnibus_data.mat'), 'omnibus');
 
 end
